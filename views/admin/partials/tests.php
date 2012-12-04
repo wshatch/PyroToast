@@ -5,10 +5,10 @@
 		  <th width="20">
 			  <?php echo form_checkbox(array('name' => 'action_to_all', 'class' => 'check-all')) ?>
 			</th>
-			<th>
+			<th class="collapse">
 			  <?php echo lang('pyrotoast:module_name') ?>
 			</th>
-			<th>
+			<th class="collapse">
 			  <?php echo lang('pyrotoast:test_class') ?>
 			</th>
 			<th>
@@ -21,8 +21,8 @@
     <?php foreach($module['tests'] as $test): ?>
       <tr>
 		    <td> <?php echo form_checkbox('action_to[]', $module['name'].':'.$test['class'] .':' . $test['method']); ?></td>
-  			<td><?php echo $module['name'] ?> </td>
-            <td><?php echo $test['class'] ?> </td>
+  			<td class="collapse"><?php echo $module['name'] ?> </td>
+            <td class="collapse"><?php echo $test['class'] ?> </td>
   			<td><?php echo $test['method'] ?> </td>
   		</tr>
 	<?php endforeach; ?>

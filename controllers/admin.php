@@ -6,25 +6,51 @@ class Admin extends Admin_Controller
     {
         //Gather all the modules
         $this->lang->load('pyrotoast');
-        $modules = $this->get_modules();
+        //Check for filter fields.
+        $class_input = $this->input->post('f_classes');
+        $class_filter = $class_input === '0' ? FALSE : $class_input;
+
+        $module_input = $this->input->post('f_module_name');
+        $module_filter = $module_input === '0' ? False : $module_input;
+        $modules = $this->get_modules($module_filter, $class_filter);
         $names = array();
         $class_names = array();
         foreach($modules as $module){
-            $names[] = $module['name'];
+            $name = $module['name'];
+            $names[$name] = $name; 
+            //Skip the ones we're trying to filter
+            if($module_filter !== false and $name !== $module_filter){
+                continue;
+            }
             foreach($module['tests'] as $test){
-                $class_names[] = $test['class'];
+                $class_name = $test['class'];
+                if($class_filter === false){
+                    $class_names[$class_name] = $class_name;
+                }
+                else if($test['class'] === $class_filter){
+                    $class_names[$class_name] = $class_name;
+                }
             }
         }
-        $class_names = array_unique($class_names);
-        //Get the path for each test module
+        $ajax = $this->input->is_ajax_request();
+        $ajax and $this->template->set_layout(FALSE);
+        //$class_names = array_values(array_unique($class_names, SORT_STRING));
+
         $this->template
          ->append_js('admin/filter.js')
          ->set('module_names', $names)
          ->set('module_tests', $modules)
          ->set('class_names', $class_names)
-         ->set_partial('filters', 'admin/partials/filters.php')
-         ->set_partial('tests', 'admin/partials/tests.php')
-         ->build('admin/index');
+         ->set_partial('filters', 'admin/partials/filters.php');
+        if($ajax){
+            $this->template
+             ->build('admin/partials/tests.php');
+        }
+        else{
+            $this->template
+             ->set_partial('tests', 'admin/partials/tests.php')
+             ->build('admin/index');
+        }
     }
 
     public function run_tests()
@@ -38,22 +64,44 @@ class Admin extends Admin_Controller
        }
         TestHandler::run_tests();
         $test_results = TestHandler::get_all_results();
+        $result_count= $this->count_results($test_results);
         $this->template
           ->set('test_results', $test_results)
-          ->set('fails', 0)
-          ->set('passes', 2)
+          ->set('fails', $result_count['fails'])
+          ->set('passes', $result_count['passes'])
           ->build('admin/report');
     }
 
-    private function get_modules()
+    private function count_results($results)
+    {
+        $passes = 0;
+        $fails = 0;
+        foreach($results as $class_results){
+            foreach($class_results['results'] as $result){
+                if($result['Result'] == 'Passed'){
+                    $passes++;
+                }
+                else{
+                    $fails++;
+                }
+            }
+        }
+        return array( 'passes' => $passes,
+                      'fails' =>  $fails);
+    }
+
+    private function get_modules($module_filter = FALSE, $class_filter = False)
     {
         $this->load->model('modules/module_m'); 
         $params = array('is_core' => FALSE);
         $modules = $this->module_m->get_all($params);
         $ret_modules = array();
         foreach($modules as $module){
+            if($module_filter !== false and $module_filter !== $module['slug']){
+                continue;
+            }
             if(is_dir($module['path'].'/tests')){
-                $ret_modules[] = array('tests' => $this->get_tests($module),
+                $ret_modules[] = array('tests' => $this->get_tests($module, $class_filter),
                                     'name' => $module['slug']);
             }
         }
@@ -61,7 +109,7 @@ class Admin extends Admin_Controller
     }
 
     /* Gets a list of test functions from the file */
-    private function get_tests($module)
+    private function get_tests($module, $class_filter = FALSE)
     {
         $dir_location = FCPATH.$module['path'].'/tests';
         $dir = opendir($dir_location);
@@ -73,15 +121,21 @@ class Admin extends Admin_Controller
         //Get the subclasses and the test functions
         $methods = array();
         foreach(get_declared_classes() as $class){
+            if($class_filter !== FALSE and $class !== $class_filter){
+                continue;
+            }
             if(is_subclass_of($class, 'Toast')){
                 $reflector = new ReflectionClass($class);
                 $reflector_methods = $reflector->getMethods(ReflectionMethod::IS_PUBLIC);
                 foreach($reflector_methods as $method){
                     //don't need to know methods that start with __ 
-                    //or constructor
                     if(strpos($method->name, '__') !== false ||
+                       //or constructor
                        $method->name === $class ||
-                       $method->getDeclaringClass()->name == "Toast"){
+                       $method->getDeclaringClass()->name == "Toast" ||
+                       //Ignore setup methods
+                       $method->name === "pre" ||
+                       $method->name === "post" ){
                        continue;
                     }
                     $methods[] = array('class'   => $class,

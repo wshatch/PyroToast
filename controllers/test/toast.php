@@ -48,6 +48,7 @@ abstract class Toast extends Admin_Controller
          $method_names = array();
          $class_name = strtolower($class);
          foreach($reflector->getMethods(ReflectionMethod::IS_PUBLIC) as $method){
+             //Ignore pre or post methods
              if(strtolower($method->class) == $class_name){
                  $methodNames[] = $method->name;
              }

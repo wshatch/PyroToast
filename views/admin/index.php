@@ -5,7 +5,7 @@
 <section class="item">
   <?php template_partial('filters'); ?>
   <?php echo form_open('admin/pyrotoast/run_tests'); ?>
-  <div id="filter_stage">
+  <div id="filter-stage">
     <?php template_partial('tests'); ?>
   </div>  
   <div class="table_action_buttons">
