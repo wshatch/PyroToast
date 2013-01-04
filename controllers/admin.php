@@ -211,7 +211,7 @@ class TestHandler
                 );
         }
         else if(empty(self::$test_obj_tree[$test_obj->module][$test_obj->test_class])){
-            self::$test_obj_tree[$test_obj->module][$test_obj->test_class] = $test_obj->method;
+            self::$test_obj_tree[$test_obj->module][$test_obj->test_class] = array($test_obj->method);
         }
         else{
             self::$test_obj_tree[$test_obj->module][$test_obj->test_class][] = $test_obj->method;
