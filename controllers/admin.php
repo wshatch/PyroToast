@@ -2,6 +2,13 @@
 
 class Admin extends Admin_Controller
 {
+    private $old_prefix;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->old_prefix = $this->db->dbprefix;
+    }
     public function index()
     {
         //Gather all the modules
@@ -120,6 +127,7 @@ class Admin extends Admin_Controller
         }
         //Get the subclasses and the test functions
         $methods = array();
+        $this->install_test_tables('Invoicer');
         foreach(get_declared_classes() as $class){
             if($class_filter !== FALSE and $class !== $class_filter){
                 continue;
@@ -144,6 +152,73 @@ class Admin extends Admin_Controller
             }
         }
         return $methods;
+    }
+
+    private function install_test_tables($module)
+    {
+        $this->change_db_prefix();
+        $this->create_settings_table();
+
+        $module_obj = $this->get_module_object($module);
+        $install_result = $module_obj->install();
+        //TODO: render an error if the test install didn't work.
+        $this->reset_db_prefix();
+    }
+
+    private function delete_test_tables($module)
+    {
+        $this->change_db_prefix();
+
+        $this->delete_settings_table();
+
+        $module_obj = $this->get_module_object($module);
+        $module_obj->uninstall();
+
+        $this->reset_db_prefix();
+    }
+
+    private function get_module_object($module)
+    {
+        //actually build the module
+        $details_module = 'Module_'.$module;
+        $details = new $details_module();
+        //Set the variables that Module_m->install does.
+        $details->site_ref = SITE_REF;
+        $details->upload_path =  'uploads/'.SITE_REF .'/';
+        return $details;
+    }
+
+
+    private function create_settings_table()
+    {
+        $this->dbforge->drop_table('settings');
+        $fields = array(
+                'slug' => array('type' => 'VARCHAR', 'constraint' => 30, 'primary' => true, 'unique' => true, 'key' => 'index_slug'),
+                'title' => array('type' => 'VARCHAR', 'constraint' => 100,),
+                'description' => array('type' => 'TEXT',),
+                'type' => array('type' => 'set',  'constraint' => array('text','textarea','password','select','select-multiple','radio','checkbox'),),
+                'default' => array('type' => 'TEXT',),
+                'value' => array('type' => 'TEXT',),
+                'options' => array('type' => 'VARCHAR', 'constraint' => 255,),
+                'is_required' => array('type' => 'INT', 'constraint' => 1,),
+                'is_gui' => array('type' => 'INT', 'constraint' => 1,),
+                'module' => array('type' => 'VARCHAR', 'constraint' => 50,),
+                'order' => array('type' => 'INT', 'constraint' => 10, 'default' => 0,),
+            );
+        $this->dbforge->add_field($fields);
+        $this->dbforge->create_table('settings', TRUE);
+    }
+
+
+    private function change_db_prefix()
+    {
+        $test_prefix = $this->settings->test_table_prefix;
+        $this->db->dbprefix = $test_prefix;
+    }
+
+    private function reset_db_prefix()
+    {
+        $this->db->dbprefix = $this->old_prefix;
     }
 }
 

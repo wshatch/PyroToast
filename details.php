@@ -21,7 +21,20 @@ class Module_PyroToast extends Module {
 
     public function install()
     {
-        return TRUE;
+        $this->db->delete('settings', array('module' => 'pyrotoast'));
+        $settings = array(
+                'slug' => 'test_table_prefix',
+                'title' => 'Table Prefix',
+                'description' => "What's the table prefix for your test data ",
+                '`default`' => 'pyrotoast_',
+                '`value' => 'pyrotoast_',
+                'type' => 'text',
+                '`options`'=> '',
+                'is_required' => 1,
+                'is_gui' => 1,
+                'module' => 'pyrotoast'
+        );
+        return $this->db->insert('settings', $settings); 
     }
 
     public function uninstall()

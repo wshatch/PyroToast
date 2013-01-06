@@ -36,6 +36,7 @@ abstract class Toast extends Admin_Controller
         $this->modelname = $name;
         $this->modelname_short = basename($name, '.php');
         $this->messages = array();
+        $this->db->dbprefix = $this->settings->test_table_prefix;
     }
     protected function index()
     {
