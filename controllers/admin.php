@@ -127,12 +127,12 @@ class Admin extends Admin_Controller
         }
         //Get the subclasses and the test functions
         $methods = array();
-        $this->install_test_tables('Invoicer');
         foreach(get_declared_classes() as $class){
             if($class_filter !== FALSE and $class !== $class_filter){
                 continue;
             }
             if(is_subclass_of($class, 'Toast')){
+                $this->install_test_tables($module['name']);
                 $reflector = new ReflectionClass($class);
                 $reflector_methods = $reflector->getMethods(ReflectionMethod::IS_PUBLIC);
                 foreach($reflector_methods as $method){
