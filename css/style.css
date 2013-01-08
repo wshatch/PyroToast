@@ -1,0 +1,7 @@
+.success, .passed {
+    color: #46a546;
+}
+.fail .failed{
+    color: #9d261d;
+}
+

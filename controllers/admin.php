@@ -76,6 +76,7 @@ class Admin extends Admin_Controller
         $test_results = $this->test_suite_m->get_results();
         $result_count= $this->count_results($test_results);
         $this->template
+          ->append_css('module::style.css')
           ->set('test_results', $test_results)
           ->set('fails', $result_count['fails'])
           ->set('passes', $result_count['passes'])

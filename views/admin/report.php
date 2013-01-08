@@ -23,7 +23,7 @@
   <?php foreach($data['results'] as $result): ?>
     <tr>
       <td><?php echo $result['method']; ?></td>
-      <td class="<?php echo $result ?>"><?php echo $result['Result'] ?></td>
+      <td class="<?php echo $result['Result'] ?>"><?php echo $result['Result'] ?></td>
     </tr>
   <?php endforeach; ?>
 <?php endforeach; ?>
