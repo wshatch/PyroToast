@@ -28,6 +28,7 @@ abstract class Toast extends Admin_Controller
     var $message;
     var $messages;
     var $asserts;
+    private $file_data = array();
 
     function __construct($name)
     {
@@ -102,8 +103,13 @@ abstract class Toast extends Admin_Controller
         foreach($old_results as $result){
             $test_name = strip_tags($result['Test Name']);
             $test_data = explode('->',$test_name);
-            $result['classname'] = $test_data[0];
-            $result['method'] = $test_data[1];
+            $result['classname'] = trim($test_data[0]);
+            $result['method'] = trim($test_data[1]);
+
+            //Set the file_data to more accurate results.
+            $method_id = 'Test_' . $result['classname'].':test_'.$result['method'];
+            $result['File Name'] = $this->file_data[$method_id]['file'];
+            $result['Line Number'] = $this->file_data[$method_id]['line'];
             unset($result['Test Name']);
             $results[] = $result;
         }
@@ -159,7 +165,18 @@ abstract class Toast extends Admin_Controller
         return FALSE;
     }
 
+    /** Used to gain accurate information for the file name and last assert line
+     *  since taking them from the Unit Testing library points to this file.
+     */
+    private function file_data()
+    {
+        $back = debug_backtrace();
+        $method_id = $back[2]['class'] . ':'. $back[2]['function'];
+        $this->file_data[$method_id] = array('file' => $back[1]["file"], 
+                                             'line' => $back[1]["line"]);
+    }
     protected function assert_true($assertion) {
+        $this->file_data();
         if($assertion) {
             return TRUE;
         } else {
@@ -169,6 +186,7 @@ abstract class Toast extends Admin_Controller
     }
 
     protected function assert_false($assertion) {
+        $this->file_data();
         if($assertion) {
             $this->asserts = FALSE;
             return FALSE;
@@ -178,6 +196,7 @@ abstract class Toast extends Admin_Controller
     }
 
     protected function assert_true_strict($assertion) {
+        $this->file_data();
         if($assertion === TRUE) {
             return TRUE;
         } else {
@@ -187,6 +206,7 @@ abstract class Toast extends Admin_Controller
     }
 
     protected function assert_false_strict($assertion) {
+        $this->file_data();
         if($assertion === FALSE) {
             return TRUE;
         } else {
@@ -196,6 +216,7 @@ abstract class Toast extends Admin_Controller
     }
 
     protected function assert_equals($base, $check) {
+        $this->file_data();
         if($base == $check) {
             return TRUE;
         } else {
@@ -205,6 +226,7 @@ abstract class Toast extends Admin_Controller
     }
 
     protected function assert_not_equals($base, $check) {
+        $this->file_data();
         if($base != $check) {
             return TRUE;
         } else {
@@ -214,6 +236,7 @@ abstract class Toast extends Admin_Controller
     }
 
     protected function assert_equals_strict($base, $check) {
+        $this->file_data();
         if($base === $check) {
             return TRUE;
         } else {
@@ -223,6 +246,7 @@ abstract class Toast extends Admin_Controller
     }
 
     protected function assert_not_equals_strict($base, $check) {
+        $this->file_data();
         if($base !== $check) {
             return TRUE;
         } else {
@@ -232,6 +256,7 @@ abstract class Toast extends Admin_Controller
     }
 
     protected function assert_empty($assertion) {
+        $this->file_data();
         if(empty($assertion)) {
             return TRUE;
         } else {
@@ -241,6 +266,7 @@ abstract class Toast extends Admin_Controller
     }
 
     protected function assert_not_empty($assertion) {
+        $this->file_data();
         if(!empty($assertion)) {
             return TRUE;
         } else {
