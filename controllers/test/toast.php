@@ -28,17 +28,21 @@ abstract class Toast extends Admin_Controller
     var $message;
     var $messages;
     var $asserts;
-    private $file_data = array();
+    var $file_data = array();
 
     function __construct($name)
     {
         parent::__construct();
         $this->load->library('unit_test');
+        //reset the results array since it's maintained by other
+        //Toast instances.
+        $this->unit->results = array();
         $this->modelname = $name;
         $this->modelname_short = basename($name, '.php');
         $this->messages = array();
         $this->db->dbprefix = $this->settings->test_table_prefix;
     }
+
     protected function index()
     {
         $this->show_all();
@@ -99,7 +103,6 @@ abstract class Toast extends Admin_Controller
         //Since I don't know how to remove the urls from Test Name in the default unit->result,
         //we replace Test Name with the class name and method name
         $old_results = $this->unit->result();
-        $results = array();
         foreach($old_results as $result){
             $test_name = strip_tags($result['Test Name']);
             $test_data = explode('->',$test_name);
@@ -107,9 +110,12 @@ abstract class Toast extends Admin_Controller
             $result['method'] = trim($test_data[1]);
 
             //Set the file_data to more accurate results.
-            $method_id = 'Test_' . $result['classname'].':test_'.$result['method'];
-            $result['File Name'] = $this->file_data[$method_id]['file'];
-            $result['Line Number'] = $this->file_data[$method_id]['line'];
+            $method_id =trim('Test_' . $result['classname'].':test_'.$result['method']);
+            //If there are no asserts in the method, they won't be added to the file_data.
+            if(in_array($method_id, $this->file_data)){
+                $result['File Name'] = $this->file_data[$method_id]['file'];
+                $result['Line Number'] = $this->file_data[$method_id]['line'];
+            }
             unset($result['Test Name']);
             $results[] = $result;
         }

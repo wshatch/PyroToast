@@ -13,9 +13,20 @@ class Test_suite_m extends My_Model
     private $test_obj_tree = array();
     private $old_prefix;
 
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->model('modules/module_m'); 
+    }
+
+    /**
+    *
+    */
     public function run_tests()
     {
         foreach($this->test_obj_tree as $module=> $test_obj){
+            $this->load_test_file($this->module_m->get($module));
+
             $this->install_test_table($module);
             foreach($test_obj as $class => $methods){
                 $test_obj = new $class();
@@ -28,11 +39,17 @@ class Test_suite_m extends My_Model
         }
     }
 
+    /**
+    *
+    */
     public function get_results()
     {
         return $this->total_results;
     }
 
+    /**
+    *
+    */
     public function add_test($test_obj)
     {
         $module = $test_obj['module'];
@@ -54,6 +71,67 @@ class Test_suite_m extends My_Model
         else{
             $this->test_obj_tree[$module][$class][] = $method;
         }
+    }
+
+    public function get_modules($module_filter = FALSE, $class_filter = False)
+    {
+        $params = array('is_core' => FALSE);
+        $modules = $this->module_m->get_all($params);
+        $ret_modules = array();
+        foreach($modules as $module){
+            if($module_filter !== false and $module_filter !== $module['slug']){
+                continue;
+            }
+            if(is_dir($module['path'].'/tests')){
+                $ret_modules[] = array('tests' => $this->get_tests($module, $class_filter),
+                                    'name' => $module['slug']);
+            }
+        }
+        return $ret_modules;
+    }
+
+    /* Gets a list of test functions from the file */
+    public function get_tests($module, $class_filter = FALSE)
+    {
+        $this->load_test_file($module);
+       //Get the subclasses and the test functions
+        $methods = array();
+        foreach(get_declared_classes() as $class){
+            if($class_filter !== FALSE and $class !== $class_filter){
+                continue;
+            }
+            if(is_subclass_of($class, 'Toast')){
+                $reflector = new ReflectionClass($class);
+                $reflector_methods = $reflector->getMethods(ReflectionMethod::IS_PUBLIC);
+                foreach($reflector_methods as $method){
+                    //don't need to know methods that start with __ 
+                    if(strpos($method->name, '__') !== false ||
+                       //or constructor
+                       $method->name === $class ||
+                       $method->getDeclaringClass()->name == "Toast" ||
+                       //Ignore setup methods
+                       $method->name === "pre" ||
+                       $method->name === "post" ){
+                       continue;
+                    }
+                    $methods[] = array('class'   => $class,
+                                       'method'  => $method->name);
+                }
+            }
+        }
+        return $methods;
+    }
+
+    private function load_test_file($module)
+    {
+        $dir_location = FCPATH.$module['path'].'/tests';
+        $dir = opendir($dir_location);
+        while(false !== ($file = readdir($dir))){
+            if(pathinfo($file, PATHINFO_EXTENSION) === 'php'){
+                include_once ($dir_location.DIRECTORY_SEPARATOR.$file);
+            }
+        }
+ 
     }
 
     private function install_test_table($module)

@@ -20,7 +20,7 @@ class Admin extends Admin_Controller
 
         $module_input = $this->input->post('f_module_name');
         $module_filter = $module_input === '0' ? False : $module_input;
-        $modules = $this->get_modules($module_filter, $class_filter);
+        $modules = $this->test_suite_m->get_modules($module_filter, $class_filter);
 
         $names = array();
         $class_names = array();
@@ -65,8 +65,9 @@ class Admin extends Admin_Controller
     public function run_tests()
     {
         //Just loads the classes
-        $this->get_modules();
+        //$this->test_suite_m->get_modules();
         $post_input= $this->input->post('action_to');
+
         $tests = array();
         foreach($post_input as $test_string){
             $test = $this->parse_string($test_string);
@@ -118,62 +119,5 @@ class Admin extends Admin_Controller
         return array( 'passes' => $passes,
                       'fails' =>  $fails);
     }
-
-    private function get_modules($module_filter = FALSE, $class_filter = False)
-    {
-        $this->load->model('modules/module_m'); 
-        $params = array('is_core' => FALSE);
-        $modules = $this->module_m->get_all($params);
-        $ret_modules = array();
-        foreach($modules as $module){
-            if($module_filter !== false and $module_filter !== $module['slug']){
-                continue;
-            }
-            if(is_dir($module['path'].'/tests')){
-                $ret_modules[] = array('tests' => $this->get_tests($module, $class_filter),
-                                    'name' => $module['slug']);
-            }
-        }
-        return $ret_modules;
-    }
-
-    /* Gets a list of test functions from the file */
-    private function get_tests($module, $class_filter = FALSE)
-    {
-        $dir_location = FCPATH.$module['path'].'/tests';
-        $dir = opendir($dir_location);
-        while(false !== ($file = readdir($dir))){
-            if(pathinfo($file, PATHINFO_EXTENSION) === 'php'){
-                include_once $dir_location.DIRECTORY_SEPARATOR.$file;
-            }
-        }
-        //Get the subclasses and the test functions
-        $methods = array();
-        foreach(get_declared_classes() as $class){
-            if($class_filter !== FALSE and $class !== $class_filter){
-                continue;
-            }
-            if(is_subclass_of($class, 'Toast')){
-                $reflector = new ReflectionClass($class);
-                $reflector_methods = $reflector->getMethods(ReflectionMethod::IS_PUBLIC);
-                foreach($reflector_methods as $method){
-                    //don't need to know methods that start with __ 
-                    if(strpos($method->name, '__') !== false ||
-                       //or constructor
-                       $method->name === $class ||
-                       $method->getDeclaringClass()->name == "Toast" ||
-                       //Ignore setup methods
-                       $method->name === "pre" ||
-                       $method->name === "post" ){
-                       continue;
-                    }
-                    $methods[] = array('class'   => $class,
-                                       'method'  => $method->name);
-                }
-            }
-        }
-        return $methods;
-    }
-
 }
 
