@@ -26,14 +26,13 @@ class Test_suite_m extends My_Model
     {
         foreach($this->test_obj_tree as $module=> $test_obj){
             $this->load_test_file($this->module_m->get($module));
-
             $this->install_test_table($module);
             foreach($test_obj as $class => $methods){
-                $test_obj = new $class();
+                $obj = new $class();
                 foreach($methods as $method){
-                    $test_obj->run($method);
+                    $obj->run($method);
                 }
-                $this->total_results[$class] = $test_obj->get_data();
+                $this->total_results[$class] = $obj->get_data();
             }
             $this->uninstall_test_table($module);
         }
@@ -125,6 +124,9 @@ class Test_suite_m extends My_Model
     private function load_test_file($module)
     {
         $dir_location = FCPATH.$module['path'].'/tests';
+        if(!is_dir($dir_location)){
+            die("bad directory: $dir_location");
+        }
         $dir = opendir($dir_location);
         while(false !== ($file = readdir($dir))){
             if(pathinfo($file, PATHINFO_EXTENSION) === 'php'){
@@ -144,6 +146,17 @@ class Test_suite_m extends My_Model
         $install_result = $module_obj->install();
         $this->reset_db_prefix();
         return $install_result;
+    }
+
+    /** 
+     *Install test versions of any module that the test requires
+    */
+    private function install_test_modules($test_obj)
+    {
+        $required_modules = $test_obj->required_modules;
+        foreach($require_modules as $module){
+            $this->install_test_table($module);
+        }
     }
 
     private function uninstall_test_table($module)

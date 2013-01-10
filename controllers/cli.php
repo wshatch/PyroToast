@@ -41,7 +41,7 @@ class Cli extends Public_Controller
         }
         //add the tests
         foreach($module_tests as $module){
-            $name = $module_tests['name'];
+            $name = $module['name'];
             foreach($module['tests'] as $test){
                 $this->test_suite_m->add_test( 
                     array(
@@ -49,17 +49,19 @@ class Cli extends Public_Controller
                         'class' => $test['class'],
                         'method' => $test['method']
                     )
-                ) 
+                ); 
             }
         }
         //now we actually run the tests
+        echo "\nrunning tests...\n";
         $this->test_suite_m->run_tests();
         $results = $this->test_suite_m->get_results();
-
         //pick which view we're going to use.
         if(in_array('xml',$used_options)){
             $this->template->build('xml_report.php');
+            return;
         }
+        $this->template->build('cli_report.php');
     }
     public function help()
     {

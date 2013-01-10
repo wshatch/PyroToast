@@ -1,4 +1,4 @@
-<?php  if (!defined('BASEPATH')) exit('No direct script access allowed');
+<?php
 /**
  * Toast
  *
@@ -19,7 +19,7 @@
  */
 
 
-abstract class Toast extends Admin_Controller
+abstract class Toast extends MY_Controller 
 {
     var $test_dir = '/test/';
 
@@ -161,7 +161,6 @@ abstract class Toast extends Admin_Controller
      * Override this method in test classes!
      */
     protected function post() { }
-
 
     private function fail($message = null) {
         $this->asserts = FALSE;
