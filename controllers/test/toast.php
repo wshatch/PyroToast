@@ -112,10 +112,11 @@ abstract class Toast extends MY_Controller
             //Set the file_data to more accurate results.
             $method_id =trim('Test_' . $result['classname'].':test_'.$result['method']);
             //If there are no asserts in the method, they won't be added to the file_data.
-            if(in_array($method_id, $this->file_data)){
+            if(in_array($method_id, array_keys($this->file_data))){
                 $result['File Name'] = $this->file_data[$method_id]['file'];
                 $result['Line Number'] = $this->file_data[$method_id]['line'];
             }
+
             unset($result['Test Name']);
             $results[] = $result;
         }

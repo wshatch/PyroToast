@@ -52,10 +52,10 @@ class Cli extends Public_Controller
                 ); 
             }
         }
-        //now we actually run the tests
-        echo "\nrunning tests...\n";
         $this->test_suite_m->run_tests();
-        $results = $this->test_suite_m->get_results();
+        $this->template->results = $this->test_suite_m->get_results();
+        $this->template->set_layout(FALSE);
+
         //pick which view we're going to use.
         if(in_array('xml',$used_options)){
             $this->template->build('xml_report.php');
