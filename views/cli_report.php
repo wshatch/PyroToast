@@ -6,6 +6,7 @@ foreach($results as $class=>$data){
     foreach($data['results'] as $result){
         $test_count++;
         if($result['Result'] === "Failed"){
+            var_dump($result);
             $fail_count++;
             echo "Test {$result['classname']}->{$result['method']} has failed! \n";
             echo " On line {$result['Line Number']} in file {$result['File Name']}\n";
