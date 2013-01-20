@@ -66,7 +66,9 @@ class Cli extends Public_Controller
         if(in_array('xml',$used_options)){
             $output = $this->template->build('xml_report.php','',$file_writer);
         }
-        $output = $this->template->build('cli_report.php','',$file_writer);
+        else{
+            $output = $this->template->build('cli_report.php','',$file_writer);
+        }
         //Write the file if requested.
         if($file_writer){
             //Change the directory to the same one the client is in.
