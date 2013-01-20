@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 //Keep our current directory since we're going to change it back in our cli controller.
 $GLOBALS['pyrotoast_client_path'] = getcwd();

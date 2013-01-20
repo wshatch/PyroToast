@@ -28,13 +28,24 @@ class Cli extends Public_Controller
             exit(0);
         }
         //Get the module to test
+        //TODO: to many embedded if statements. Refactor.
         if(in_array('m', $used_options)){
-            //Check to see if there's a valid class
-            if(!in_array('c', $used_options)){
+            //make sure that there is a m argument
+            if(!$options['m']){
+                exit("There's no module argument. Please use -m<module_name> instead of -m <module_name>\n");
+            }
+            if(in_array('c', $used_options)){
+                if(!$options['c']){
+                    exit("There's no class argument. Please use -m<module_name> and -c<class_name>\n");
+                }
                 $module_tests = $this->test_suite_m->get_modules($options['m'], $options['c']);
             }
             else{
                 $module_tests= $this->test_suite_m->get_modules($options['m']);
+            }
+            //We had a bad module or class arguement
+            if(empty($module_tests)){
+                exit("Unable to find tests for the module or class.\n Please make sure you're using -m<module_name> instead of -m <module_name>\n");
             }
         }
         //Test ALL the modules!
@@ -85,11 +96,17 @@ class Cli extends Public_Controller
     }
     public function help()
     {
-        //TODO: replace this with a help view
-        echo "Help called! \n";
+        echo "Usage:  client.php\n"; 
+        echo "\tclient.php [options]\n";
+        echo "\tclient.php [options] -f<file>\n";
+        echo "\n";
+        echo "Options: ";
+        echo "\n";
+        echo "\t-f<file> writes output to <file>\n";
+        echo "\t-m<module> module to run tests for \n";
+        echo "\t-c<class> runs the test class (requires the -m argument) \n";
+        echo "\t--xml output in a JUnit format\n";
+        echo "\t--help brings this help menu\n";
     }
 
-    public function test()
-    {
-    }
 }
