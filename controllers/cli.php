@@ -2,7 +2,7 @@
 
 class Cli extends Public_Controller
 {
-    private $shortops = "c::m::";
+    private $shortops = "c::m::f::";
     private $longops = array(
         "help",
         "xml"
@@ -17,6 +17,7 @@ class Cli extends Public_Controller
         $this->template->set_layout(FALSE);
         parent::__construct();
     }
+    //TODO refactor into helper functions.
     public function index()
     {
         $options = getopt($this->shortops, $this->longops);
@@ -24,6 +25,7 @@ class Cli extends Public_Controller
         //Ignore everything and just render help
         if(in_array('help',$used_options)){
             $this->help();
+            exit(0);
         }
         //Get the module to test
         if(in_array('m', $used_options)){
@@ -38,6 +40,11 @@ class Cli extends Public_Controller
         //Test ALL the modules!
         else{
             $module_tests= $this->test_suite_m->get_modules();
+        }
+        //output to a file
+        $file_writer = False;
+        if(in_array('f', $used_options)){
+            $file_writer = True;
         }
         //add the tests
         foreach($module_tests as $module){
@@ -55,13 +62,24 @@ class Cli extends Public_Controller
         $this->test_suite_m->run_tests();
         $this->template->results = $this->test_suite_m->get_results();
         $this->template->set_layout(FALSE);
-
         //pick which view we're going to use.
         if(in_array('xml',$used_options)){
-            $this->template->build('xml_report.php');
-            return;
+            $output = $this->template->build('xml_report.php','',$file_writer);
         }
-        $this->template->build('cli_report.php');
+        $output = $this->template->build('cli_report.php','',$file_writer);
+        //Write the file if requested.
+        if($file_writer){
+            //Change the directory to the same one the client is in.
+            chdir($GLOBALS['pyrotoast_client_path']);
+            $file = @fopen($options['f'], "w");
+            if(!$file){
+                error_log("Unable to open the file {$options['f']} for output. Are you sure
+                your webserver has access to the file? ");
+                die(1);
+            }
+            $file_write_result = fwrite($file, $output);
+            fclose($file);
+        }
     }
     public function help()
     {

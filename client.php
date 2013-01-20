@@ -1,4 +1,6 @@
 <?php
+//Keep our current directory since we're going to change it back in our cli controller.
+$GLOBALS['pyrotoast_client_path'] = getcwd();
 //change this variable to whatever you're using in 
 //$config['index_page'] in system/cms/config/config.php
 $index_page = '';
