@@ -7,20 +7,20 @@ development instances and should not be deployed.
 Writting Tests
 ==============
 Tests are stored in a directory \<my module\>/tests. To write a test, simply extend the Toast class in a file in your module's test directory like so:
-    <?php
-    $path = 'modules/pyrotoast/controllers/test/toast.php'
-    if(file_exists(ADDONPATH.$path)){
-        require_once(ADDONPATH.$path);
-    }
-    else{
-        require_once(SHARED_ADDONPATH.$path);
-    }
-    class Test_Some_Model_m extends Toast
-    {
-        public function test_true(){
-            $this->assert_true(TRUE);
+        <?php
+        $path = 'modules/pyrotoast/controllers/test/toast.php'
+        if(file_exists(ADDONPATH.$path)){
+            require_once(ADDONPATH.$path);
         }
-    }
+        else{
+            require_once(SHARED_ADDONPATH.$path);
+        }
+        class Test_Some_Model_m extends Toast
+        {
+            public function test_true(){
+                $this->assert_true(TRUE);
+            }
+        }
 For more documentation on asserts, [see Toast's library](http://jensroland.com/projects/toast)
 
 Running Tests
