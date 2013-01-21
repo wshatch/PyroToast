@@ -17,6 +17,7 @@
         <?php endif;?>
       </testcase>
     <?php endforeach; ?>
+    </testsuite>
   <?php endforeach;} ?>
 
 </testsuites>
