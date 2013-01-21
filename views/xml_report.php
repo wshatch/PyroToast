@@ -1,6 +1,9 @@
-<?php echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" ?>
+<?php print "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" ?>
 <testsuites>
-  <?php foreach($results as $class => $data): ?>
+ 
+  <?php 
+  if($results){
+  foreach($results as $class => $data): ?>
     <testsuite name="<?php echo $data;?>"
     >
     <?php foreach($data['results'] as $result): ?>
@@ -14,6 +17,6 @@
         <?php endif;?>
       </testcase>
     <?php endforeach; ?>
-  <?php endforeach; ?>
+  <?php endforeach;} ?>
 
 </testsuites>

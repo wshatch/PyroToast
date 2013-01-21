@@ -1,5 +1,8 @@
 #!/usr/bin/php
 <?php
+//Hackish way to make sure we switch to the directory that index.php is in
+$file_path = $_SERVER['PWD'].'/'.$_SERVER['PHP_SELF'];
+chdir(dirname($file_path));
 //Keep our current directory since we're going to change it back in our cli controller.
 $GLOBALS['pyrotoast_client_path'] = getcwd();
 //change this variable to whatever you're using in 
