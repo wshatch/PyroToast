@@ -11,7 +11,7 @@ $default_args = array($argv[0], 'pyrotoast', 'cli','index');
 $other_args = array_slice($argv, 1);
 $args = array_merge($default_args, $other_args);
 //generate the request URI 
-$request_URI = '/'.$index_page. implode(array_slice($args,1), '/');
+$request_URI = '/'. implode(array_slice($args,1), '/');
 
 /* Just define some globals used in config to get rid of some errors.*/
 $temp_server = array(

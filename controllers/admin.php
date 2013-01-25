@@ -72,7 +72,7 @@ class Admin extends Admin_Controller
         foreach($post_input as $test_string){
             $test = $this->parse_string($test_string);
             $this->test_suite_m->add_test($test);
-       }
+        }
         $this->test_suite_m->run_tests();
         $test_results = $this->test_suite_m->get_results();
         $result_count= $this->count_results($test_results);
@@ -80,7 +80,7 @@ class Admin extends Admin_Controller
           ->append_css('module::style.css')
           ->set('test_results', $test_results)
           ->set('fails', $result_count['fails'])
-          ->set('passes', $result_count['passes'])
+          ->set('passes', $result_count['passes']);
           ->build('admin/report');
     }
 
