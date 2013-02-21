@@ -22,7 +22,7 @@
 abstract class Toast extends MY_Controller 
 {
     var $test_dir = '/test/';
-
+    var $name= null;
     var $modelname;
     var $modelname_short;
     var $message;
@@ -30,21 +30,20 @@ abstract class Toast extends MY_Controller
     var $asserts;
     var $file_data = array();
 
-    function __construct($name)
+    function __construct()
     {
         parent::__construct();
         $this->load->library('unit_test');
         //reset the results array since it's maintained by other
         //Toast instances.
         $this->unit->results = array();
-        $this->modelname = $name;
-        $this->modelname_short = basename($name, '.php');
         $this->messages = array();
         $this->db->dbprefix = $this->settings->test_table_prefix;
     }
 
     protected function index()
     {
+    echo $name;
         $this->show_all();
     }
     protected function get_test_methods()
