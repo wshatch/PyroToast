@@ -25,7 +25,6 @@ Tests are stored in a directory \<my module\>/tests. To write a test, simply ext
         public function test_true(){
             $this->assert_true(TRUE);
         }
-    }
 For more documentation on asserts, [see Toast's library](http://jensroland.com/projects/toast)
 
 Running Tests
@@ -40,8 +39,9 @@ If you have a bug, question, suggestion, or having any issues running and instal
 are to be expected.
 
 License
-=========
-MIT License
+=======
+Licensed with the MIT License.
+
 Copyright (c) 2013 William Hatch 
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
