@@ -80,7 +80,7 @@ class Admin extends Admin_Controller
           ->append_css('module::style.css')
           ->set('test_results', $test_results)
           ->set('fails', $result_count['fails'])
-          ->set('passes', $result_count['passes']);
+          ->set('passes', $result_count['passes'])
           ->build('admin/report');
     }
 
