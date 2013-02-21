@@ -9,7 +9,7 @@ Writting Tests
 Tests are stored in a directory \<my module\>/tests. To write a test, simply extend the Toast class in a file in your module's test directory like so:
 
     <?php
-    $path = 'modules/pyrotoast/controllers/test/toast.php'
+    $path = 'modules/pyrotoast/controllers/test/toast.php';
     if(file_exists(ADDONPATH.$path)){
         require_once(ADDONPATH.$path);
     }
