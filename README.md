@@ -25,6 +25,7 @@ Tests are stored in a directory \<my module\>/tests. To write a test, simply ext
         public function test_true(){
             $this->assert_true(TRUE);
         }
+     }
 For more documentation on asserts, [see Toast's library](http://jensroland.com/projects/toast)
 
 Running Tests
