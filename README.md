@@ -17,6 +17,11 @@ Tests are stored in a directory \<my module\>/tests. To write a test, simply ext
     }
     class Test_Some_Model_m extends Toast
     {
+        public function Test_Some_Model_m()
+        {
+            parent::__construct('Some_Model_m');
+            $this->load-Model('My_Module/Some_module_m');
+        }
         public function test_true(){
             $this->assert_true(TRUE);
         }
