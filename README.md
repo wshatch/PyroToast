@@ -7,6 +7,7 @@ development instances and should not be deployed.
 Writting Tests
 ==============
 Tests are stored in a directory \<my module\>/tests. To write a test, simply extend the Toast class in a file in your module's test directory like so:
+
     <?php
     $path = 'modules/pyrotoast/controllers/test/toast.php'
     if(file_exists(ADDONPATH.$path)){
@@ -22,6 +23,7 @@ Tests are stored in a directory \<my module\>/tests. To write a test, simply ext
             parent::__construct('Some_Model_m');
             $this->load-Model('My_Module/Some_module_m');
         }
+
         public function test_true(){
             $this->assert_true(TRUE);
         }
