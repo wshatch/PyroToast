@@ -18,6 +18,12 @@ Tests are stored in a directory \<my module\>/tests. To write a test, simply ext
     }
     class Test_Some_Model_m extends Toast
     {
+        public function pre()
+        {
+            $this->Some_Module_m->current_user = (object) array(
+                'id' => 1
+            );
+        }
         public function Test_Some_Model_m()
         {
             parent::__construct('Some_Model_m');
@@ -29,7 +35,7 @@ Tests are stored in a directory \<my module\>/tests. To write a test, simply ext
         }
      }
 For more documentation on asserts, [see Toast's library](http://jensroland.com/projects/toast)
-
+Keep in mind that some of the functions have been renamed to remove underscores. \_pre and \_post for example have been renmaed pre and post.
 Running Tests
 =============
 There are two ways of running unit tests
